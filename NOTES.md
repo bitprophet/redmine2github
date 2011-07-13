@@ -33,7 +33,8 @@
 
 ### Notes
 
-* Uh...Github has no attachments. So we need to either commit to just ditching all of ours (meh) or transforming them into additional comments.
+* Text attachments could become Gists linked in the body text / as the first few comments.
+* Non-text attachments, see Files below.
 
 
 ## Relations
@@ -77,4 +78,5 @@
 * Only File we host which is not a tag snapshot is a copy of Paramiko 1.7.6, but that was only added recently and I don't believe it was highly publicized.
 * However, existing OS source packages probably refer to these -- we'll need to reach out to them (at the very least, Arch and Debian/Ubuntu, I don't know if anybody made RPMs) to see if that's a big deal or if the existing binary packages are "good enough" and don't need rebulding.
     * Could keep the files on the nginx/whatever setup I plan on replacing code.fabfile with eventually...
+    * Or use GH Pages (`gh-pages` branch), though if I need an nginx set up at code.fabfile anyways...
     * Certainly, the maintainers need to be informed that we will be moving to GH and any future releases won't be at the Redmine URL.
