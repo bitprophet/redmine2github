@@ -64,10 +64,14 @@
 
 * We only really care about 1.x and 2.x here, so that is a simplified mapping
 * Should probably create the pre-existing ones that are already closed?
+* Relationship from Issue to Version is `Issue.fixed_version` for some stupid
+reason, and the inverse is of course `Version.fixed_issues`.
 
 ### Mapping
 
-* TK
+* `name` => `title`
+* `description` => `description`
+* `effective_date` => if set, `state` is `"closed"`
 
 
 ## Files (N/A)
