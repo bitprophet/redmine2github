@@ -21,6 +21,10 @@ class GitHub
   def issue(id)
     @api["/issues/#{id}"].get
   end
+
+  def method_missing(sym, *args, &block)
+    @api.send(sym, *args, &block)
+  end
 end
 
 
