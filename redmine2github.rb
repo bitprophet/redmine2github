@@ -35,7 +35,6 @@ Issue.find(:all, :order => "id ASC").each do |issue|
   puts ">>> [#{issue.id}] #{issue.subject}"
   begin
     gh = github.issue(issue.id)
-    puts gh.
     puts "!! Issue ##{issue.id} already exists on GitHub: #{gh['title']}"
     puts "!! Skipping."
     skipped_ids << issue.id
