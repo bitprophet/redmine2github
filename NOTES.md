@@ -5,6 +5,7 @@
 ### Notes
 
 * Can't set number explicitly :( so need to go in order and abort if we can't match things up correctly -- probably detect after done w/ an issue whether it got the right ID
+    * This will only work if issue numbers get "reset" after deletion -- will definitely need specific support from Github on the subject.
 * Can't set state when creating, so need a create-and-edit flow
 * No concept of closing-as-dupe, closing-as-wontfix in GH, so probably use labels for that
 * No concept of "submitter" on GH (except in pull requests, kinda) so put that in as a prefix/postfix to body text probably
