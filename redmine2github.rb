@@ -34,7 +34,7 @@ repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
-issue_ids = %w(282 358 114 3)
+issue_ids = %w(282 358 114 3 10)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
@@ -54,8 +54,7 @@ issues.each do |issue|
       :assignee => "bitprophet", # Always assigned to me
       :labels => []
     }
-    #   Submitter note in desc
-    #   Create date in desc
+    #   Create date in desc #   Submitter note in desc
     submitter_text = unless issue.author.login == "jforcier"
       submitter = issue.author.login
       submitter_link = begin
@@ -76,9 +75,30 @@ issues.each do |issue|
     # Bug, feature, support
     params[:labels] << issue.tracker.name
     # For each attachment:
+    gisted = {}
+    issue.attachments.each do |a|
+      puts "\t #{a.filename} (#{a.content_type}) [#{a.filesize}]"
     #   If not text in nature, warn & skip
+      # All attachment filetypes are some form of text except this one
+      if a.content_type == "application/octet-stream"
+        puts "\t\t Non-text filetype, manually port this one"
+        next
+      end
     #   Create gist
-    #   Add note at bottom of desc w/ link
+      response = github["gists"].post({
+        :public => false,
+        :description => a.description,
+        :files => {
+          a.filename => {:content => File.new(a.diskfile, "rb").read}
+        }
+      }.to_json)
+      gisted[a.filename] = JSON.parse(response)['html_url']
+    end
+    # Add note at bottom of desc w/ link
+    if gisted
+      params[:body] << "\n\nAttachments:\n"
+      params[:body] << gisted.map {|name, url| "* [#{name}](#{url})"}.join("\n")
+    end
     # For each related issue:
     #   Add note+link at bottom of desc
     # For each journal/comment, sorting by created_on:
