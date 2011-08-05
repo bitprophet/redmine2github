@@ -1,8 +1,10 @@
 require 'rubygems'
-require 'rest_client'
 require 'json'
 
-REPO = ENV['REPO'] || "bitprophet/redmine2github"
+REPO = ENV['REPO'] || "bitprophet/issuetest"
+
+ENV['RESTCLIENT_LOG'] = 'stdout'
+require 'rest_client'
 
 
 class GitHub
@@ -33,16 +35,24 @@ skipped_ids = []
 
 Issue.find(:all, :order => "id ASC").each do |issue|
   puts ">>> [#{issue.id}] #{issue.subject}"
-  begin
-    gh = github.issue(issue.id)
-    puts "!! Issue ##{issue.id} already exists on GitHub: #{gh['title']}"
-    puts "!! Skipping."
-    skipped_ids << issue.id
-    next
-  rescue RestClient::ResourceNotFound
-    # Create new issue based on mapping, and:
+  #begin
+  #  gh = github.issue(issue.id)
+  #  puts "!! Issue ##{issue.id} already exists on GitHub: #{gh['title']}"
+  #  puts "!! Skipping."
+  #  skipped_ids << issue.id
+  #  next
+  #rescue RestClient::ResourceNotFound
+    break if issue.id > 5
+    # Create new issue based on mapping
+    params = {
+      :title => issue.subject,
+      :body => issue.description,
+      :assignee => "bitprophet", # Always assigned to me
+    }
     #   Submitter note in desc
-    #   Assigned to me
+    unless issue.author.login == "jforcier"
+      params[:body] << "\n\nOriginally submitted by **#{issue.author.login}**"
+    end
     #   Create date in desc
     # If issue was closed, close it on GH
     # Set labels for "dupe", "wontfix" etc
@@ -59,8 +69,11 @@ Issue.find(:all, :order => "id ASC").each do |issue|
     # Assign to appropriate milestone:
     #   If closed, assign to real closed milestone
     #   If open, label as 1.x or 2.x - no milestone
-    break if issue.id > 5
-  end
+    puts "Would generate following POST params hash:"
+    pp params
+    puts ""
+    #github['/issues'].post(params.to_json, :content_type => 'text/json')
+  #end
 end
 
 puts "Skipped #{skipped_ids.size} issue(s) numbered #{skipped_ids.join(", ")}."
