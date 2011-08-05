@@ -34,7 +34,11 @@ repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
-Issue.find(:all, :order => "id ASC").each do |issue|
+issue_ids = %w(282 358)
+issues = issue_ids.map {|x| Issue.find(x)}
+
+#Issue.find(:all, :order => "id ASC").each do |issue|
+issues.each do |issue|
   puts ">>> [#{issue.id}] #{issue.subject}"
   #begin
   #  gh = github.issue(issue.id)
@@ -43,7 +47,6 @@ Issue.find(:all, :order => "id ASC").each do |issue|
   #  skipped_ids << issue.id
   #  next
   #rescue RestClient::ResourceNotFound
-    break if issue.id > 5
     # Create new issue based on mapping
     params = {
       :title => issue.subject,
