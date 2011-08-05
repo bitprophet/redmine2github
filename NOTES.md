@@ -8,6 +8,7 @@
     * This will only work if issue numbers get "reset" after deletion -- will definitely need specific support from Github on the subject.
 * Can't set state when creating, so need a create-and-edit flow
 * No concept of closing-as-dupe, closing-as-wontfix in GH, so probably use labels for that
+    * Not going to bother with this; per-ticket closure statuses will be noted in the comments, and I do not see a need to search/filter by these statuses.
 * No concept of "submitter" on GH (except in pull requests, kinda) so put that in as a prefix/postfix to body text probably
 * Assignee should be me always -- a few things are assigned to Morgan but that doesn't really mean anything serious ATM, we can rework how we want to use that on the GH side later.
 * Priorities -- keep the "random access" ones we sometimes want lists of, mostly Wart/Quick, drop the rest since we can't sort by them.

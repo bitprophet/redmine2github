@@ -34,7 +34,7 @@ repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
-issue_ids = %w(282 358 114)
+issue_ids = %w(282 358 114 3)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
@@ -52,6 +52,7 @@ issues.each do |issue|
       :title => issue.subject,
       :body => issue.description,
       :assignee => "bitprophet", # Always assigned to me
+      :labels => []
     }
     #   Submitter note in desc
     #   Create date in desc
@@ -69,9 +70,11 @@ issues.each do |issue|
     end
     create_date = " on #{issue.created_on.strftime("%F %I:%M%P %Z")}"
     params[:body] << "\n\nOriginally submitted#{submitter_text}#{create_date}"
-    # If issue was closed, close it on GH
-    # Set labels for "dupe", "wontfix" etc
     # Set labels for quick, wart, others?
+    priority = issue.priority.name
+    params[:labels] << priority if %w(Quick Wart).include?(priority)
+    # Bug, feature, support
+    params[:labels] << issue.tracker.name
     # For each attachment:
     #   If not text in nature, warn & skip
     #   Create gist
@@ -84,6 +87,7 @@ issues.each do |issue|
     # Assign to appropriate milestone:
     #   If closed, assign to real closed milestone
     #   If open, label as 1.x or 2.x - no milestone
+    # If issue was closed, close it on GH
     puts "Would generate following POST params hash:"
     pp params
     puts ""
