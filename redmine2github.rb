@@ -8,9 +8,9 @@ require 'rest_client'
 
 
 class GitHub
-  def initialize
+  def initialize(section="")
     @api = RestClient::Resource.new(
-      "https://api.github.com/repos/#{REPO}",
+      "https://api.github.com/#{section}",
       ENV['GITHUB_USERNAME'],
       ENV['GITHUB_PASSWORD']
     )
@@ -30,6 +30,7 @@ class GitHub
 end
 
 
+repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
@@ -72,7 +73,7 @@ Issue.find(:all, :order => "id ASC").each do |issue|
     puts "Would generate following POST params hash:"
     pp params
     puts ""
-    #github['/issues'].post(params.to_json, :content_type => 'text/json')
+    #repo['/issues'].post(params.to_json, :content_type => 'text/json')
   #end
 end
 
