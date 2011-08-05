@@ -55,7 +55,14 @@ issues.each do |issue|
     }
     #   Submitter note in desc
     unless issue.author.login == "jforcier"
-      params[:body] << "\n\nOriginally submitted by **#{issue.author.login}**"
+      submitter = issue.author.login
+      submitter_link = begin
+        gh_user = JSON.parse github["users/#{submitter}"].get
+        "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
+      rescue RestClient::ResourceNotFound
+        "**#{issue.author.name}** (#{submitter})"
+      end
+      params[:body] << "\n\nOriginally submitted by #{submitter_link}"
     end
     #   Create date in desc
     # If issue was closed, close it on GH
@@ -76,6 +83,8 @@ issues.each do |issue|
     puts "Would generate following POST params hash:"
     pp params
     puts ""
+    puts "Human readable body text:"
+    puts params[:body]
     #repo['/issues'].post(params.to_json, :content_type => 'text/json')
   #end
 end
