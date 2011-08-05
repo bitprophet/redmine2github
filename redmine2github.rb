@@ -34,7 +34,7 @@ repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
-issue_ids = %w(282 358)
+issue_ids = %w(282 358 114)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
@@ -54,7 +54,8 @@ issues.each do |issue|
       :assignee => "bitprophet", # Always assigned to me
     }
     #   Submitter note in desc
-    unless issue.author.login == "jforcier"
+    #   Create date in desc
+    submitter_text = unless issue.author.login == "jforcier"
       submitter = issue.author.login
       submitter_link = begin
         gh_user = JSON.parse github["users/#{submitter}"].get
@@ -62,9 +63,12 @@ issues.each do |issue|
       rescue RestClient::ResourceNotFound
         "**#{issue.author.name}** (#{submitter})"
       end
-      params[:body] << "\n\nOriginally submitted by #{submitter_link}"
+      " by #{submitter_link}"
+    else
+      ""
     end
-    #   Create date in desc
+    create_date = " on #{issue.created_on.strftime("%F %I:%M%P %Z")}"
+    params[:body] << "\n\nOriginally submitted#{submitter_text}#{create_date}"
     # If issue was closed, close it on GH
     # Set labels for "dupe", "wontfix" etc
     # Set labels for quick, wart, others?
