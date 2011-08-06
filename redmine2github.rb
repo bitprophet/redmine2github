@@ -108,12 +108,27 @@ issues.each do |issue|
     #   If closed, assign to real closed milestone
     #   If open, label as 1.x or 2.x - no milestone
     # If issue was closed, close it on GH
-    puts "Would generate following POST params hash:"
-    pp params
-    puts ""
-    puts "Human readable body text:"
-    puts params[:body]
-    #repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    #puts "Would generate following POST params hash:"
+    #pp params
+    #puts ""
+    #puts "Human readable body text:"
+    #puts params[:body]
+    begin
+    # Ensure labels exist
+    params[:labels].each do |label|
+      begin
+        repo["/labels/#{label}"].get
+      rescue RestClient::ResourceNotFound
+        puts ">> Creating new label '#{label}'"
+        repo["/labels"].post({:name => label}.to_json)
+      end
+    end
+    # Post it!
+    repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    rescue => e
+      pp JSON.parse(e.response)
+      raise
+    end
   #end
 end
 
