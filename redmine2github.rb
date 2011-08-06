@@ -50,7 +50,7 @@ issues.each do |issue|
     # Create new issue based on mapping
     params = {
       :title => issue.subject,
-      :body => issue.description,
+      :body => "### Description\n\n" + issue.description,
       :assignee => "bitprophet", # Always assigned to me
       :labels => []
     }
@@ -67,8 +67,8 @@ issues.each do |issue|
     else
       ""
     end
-    create_date = " on #{issue.created_on.strftime("%F %I:%M%P %Z")}"
-    params[:body] << "\n\nOriginally submitted#{submitter_text}#{create_date}"
+    create_date = " on #{issue.created_on.strftime("**%F** at **%I:%M%P %Z**")}"
+    params[:body] << "\n\n----\n\nOriginally submitted#{submitter_text}#{create_date}"
     # Set labels for quick, wart, others?
     priority = issue.priority.name
     params[:labels] << priority if %w(Quick Wart).include?(priority)
@@ -96,7 +96,7 @@ issues.each do |issue|
     end
     # Add note at bottom of desc w/ link
     if gisted
-      params[:body] << "\n\nAttachments:\n"
+      params[:body] << "\n\n### Attachments\n\n"
       params[:body] << gisted.map {|name, url| "* [#{name}](#{url})"}.join("\n")
     end
     # For each related issue:
