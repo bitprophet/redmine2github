@@ -124,7 +124,7 @@ issues.each do |issue|
       end
     end
     # Post it!
-    repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    #repo['/issues'].post(params.to_json, :content_type => 'text/json')
     rescue => e
       pp JSON.parse(e.response)
       raise
