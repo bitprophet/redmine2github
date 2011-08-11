@@ -38,6 +38,24 @@ skipped_ids = []
 issue_ids = %w(7 49 223)
 issues = issue_ids.map {|x| Issue.find(x)}
 
+
+def submitter_link(github, author)
+  unless author.login == "jforcier"
+    submitter = author.login
+    begin
+      gh_user = JSON.parse github["users/#{submitter}"].get
+      "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
+    rescue RestClient::ResourceNotFound
+      "**#{author.name}** (#{submitter})"
+    end
+  end
+end
+
+def submit_date(github, object)
+  " on #{object.created_on.strftime("**%F** at **%I:%M%P %Z**")}"
+end
+
+
 #Issue.find(:all, :order => "id ASC").each do |issue|
 issues.each do |issue|
   puts ">>> [#{issue.id}] #{issue.subject}"
@@ -56,20 +74,9 @@ issues.each do |issue|
       :labels => []
     }
     #   Create date in desc #   Submitter note in desc
-    submitter_text = unless issue.author.login == "jforcier"
-      submitter = issue.author.login
-      submitter_link = begin
-        gh_user = JSON.parse github["users/#{submitter}"].get
-        "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
-      rescue RestClient::ResourceNotFound
-        "**#{issue.author.name}** (#{submitter})"
-      end
-      " by #{submitter_link}"
-    else
-      ""
-    end
-    create_date = " on #{issue.created_on.strftime("**%F** at **%I:%M%P %Z**")}"
-    params[:body] << "\n\n----\n\nOriginally submitted#{submitter_text}#{create_date}"
+    link = submitter_link(github, issue.author)
+    submitter_text = link ? "by #{link}" : ""
+    params[:body] << "\n\n----\n\nOriginally submitted#{submitter_text}#{submit_date(github, issue)}"
     # Set labels for quick, wart, others?
     priority = issue.priority.name
     params[:labels] << priority if %w(Quick Wart).include?(priority)
@@ -111,9 +118,6 @@ issues.each do |issue|
         params[:body] << "* ##{i.id}: #{i.subject}\n"
       end
     end
-    # For each journal/comment, sorting by created_on:
-    #   Add to GH issue
-    #   Include original username, submit date in body field
     # Assign to appropriate milestone:
     #   If closed, assign to real closed milestone
     #   If open, label as 1.x or 2.x - no milestone
@@ -123,6 +127,17 @@ issues.each do |issue|
     puts ""
     puts "Human readable body text:"
     puts params[:body]
+
+    # For each journal/comment, sorting by created_on:
+    comment_params = []
+    issue.journals.each do |journal|
+      # Include original username, submit date in body field
+      
+      # Add to GH issue
+    end
+    puts ""
+    puts "Would generate following comment params hashes:"
+    pp comment_params
     #begin
     ## Ensure labels exist
     #params[:labels].each do |label|
