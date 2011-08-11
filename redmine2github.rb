@@ -116,6 +116,8 @@ issues.each do |issue|
     puts ""
     puts "Would generate following comment params hashes:"
     pp comment_params
+
+
     #begin
     ## Ensure labels exist
     #params[:labels].each do |label|
@@ -133,6 +135,8 @@ issues.each do |issue|
     #  pp JSON.parse(e.response)
     #  raise
     #end
+
+
   #end
 end
 
