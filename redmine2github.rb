@@ -129,7 +129,13 @@ issues.each do |issue|
     #  end
     #end
     ## Post it!
-    #repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    #response = repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    ## Post comments!
+    #comment_params.each do |comment|
+    #  repo["/issues/#{JSON.parse(response)['number']}/comments"].post(
+    #    comment.to_json, :content_type => 'text/json'
+    #  )
+    #end
     #rescue => e
     #  pp e
     #  pp JSON.parse(e.response)
