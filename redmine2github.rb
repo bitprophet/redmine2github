@@ -35,7 +35,7 @@ github = GitHub.new
 skipped_ids = []
 
 #issue_ids = %w(282 358 114 3 10 7)
-issue_ids = %w(7 49 223)
+issue_ids = %w(49)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 
@@ -53,6 +53,12 @@ end
 
 def submit_date(github, object)
   " on #{object.created_on.strftime("**%F** at **%I:%M%P %Z**")}"
+end
+
+def submit_line(github, author, object)
+  link = submitter_link(github, author)
+  submitter_text = link ? " by #{link}" : ""
+  "\n\n----\n\nOriginally submitted#{submitter_text}#{submit_date(github, object)}"
 end
 
 
@@ -74,9 +80,7 @@ issues.each do |issue|
       :labels => []
     }
     #   Create date in desc #   Submitter note in desc
-    link = submitter_link(github, issue.author)
-    submitter_text = link ? "by #{link}" : ""
-    params[:body] << "\n\n----\n\nOriginally submitted#{submitter_text}#{submit_date(github, issue)}"
+    params[:body] << submit_line(github, issue.author, issue)
     # Set labels for quick, wart, others?
     priority = issue.priority.name
     params[:labels] << priority if %w(Quick Wart).include?(priority)
@@ -131,9 +135,12 @@ issues.each do |issue|
     # For each journal/comment, sorting by created_on:
     comment_params = []
     issue.journals.each do |journal|
+      next unless journal.notes
+      body = journal.notes
       # Include original username, submit date in body field
-      
+      body << submit_line(github, journal.user, journal)
       # Add to GH issue
+      comment_params << {:body => body}
     end
     puts ""
     puts "Would generate following comment params hashes:"
