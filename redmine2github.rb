@@ -78,13 +78,13 @@ issues.each do |issue|
     gisted = {}
     issue.attachments.each do |a|
       puts "\t #{a.filename} (#{a.content_type}) [#{a.filesize}]"
-    #   If not text in nature, warn & skip
+      # If not text in nature, warn & skip
       # All attachment filetypes are some form of text except this one
       if a.content_type == "application/octet-stream"
         puts "\t\t Non-text filetype, manually port this one"
         next
       end
-    #   Create gist
+      # Create gist
       response = github["gists"].post({
         :public => false,
         :description => a.description,
