@@ -1,5 +1,7 @@
 require 'github'
 
+POST_OK = true
+
 repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
@@ -117,31 +119,29 @@ issues.each do |issue|
     puts "Would generate following comment params hashes:"
     pp comment_params
 
-
-    #begin
-    ## Ensure labels exist
-    #params[:labels].each do |label|
-    #  begin
-    #    repo["/labels/#{label}"].get
-    #  rescue RestClient::ResourceNotFound
-    #    puts ">> Creating new label '#{label}'"
-    #    repo["/labels"].post({:name => label}.to_json)
-    #  end
-    #end
-    ## Post it!
-    #response = repo['/issues'].post(params.to_json, :content_type => 'text/json')
-    ## Post comments!
-    #comment_params.each do |comment|
-    #  repo["/issues/#{JSON.parse(response)['number']}/comments"].post(
-    #    comment.to_json, :content_type => 'text/json'
-    #  )
-    #end
-    #rescue => e
-    #  pp e
-    #  pp JSON.parse(e.response)
-    #  raise
-    #end
-
+    begin
+      # Ensure labels exist
+      params[:labels].each do |label|
+        begin
+          repo["/labels/#{label}"].get
+        rescue RestClient::ResourceNotFound
+          puts ">> Creating new label '#{label}'"
+          repo["/labels"].post({:name => label}.to_json)
+        end
+      end
+      # Post it!
+      response = repo['/issues'].post(params.to_json, :content_type => 'text/json')
+      # Post comments!
+      comment_params.each do |comment|
+        repo["/issues/#{JSON.parse(response)['number']}/comments"].post(
+          comment.to_json, :content_type => 'text/json'
+        )
+      end
+    rescue => e
+      pp e
+      pp JSON.parse(e.response)
+      raise
+    end if POST_OK
 
   #end
 end
