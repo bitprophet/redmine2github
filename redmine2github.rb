@@ -105,7 +105,7 @@ issues.each do |issue|
 
     # For each journal/comment, sorting by created_on:
     comment_params = []
-    issue.journals.each do |journal|
+    issue.journals.sort_by {|x| x.created_on}.each do |journal|
       next unless journal.notes
       body = journal.notes
       # Include original username, submit date in body field
