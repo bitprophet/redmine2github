@@ -100,7 +100,16 @@ issues.each do |issue|
       params[:body] << gisted.map {|name, url| "* [#{name}](#{url})"}.join("\n")
     end
     # For each related issue:
-    #   Add note+link at bottom of desc
+    params[:body] << "\n\n### Relations\n\n" unless issue.relations.empty?
+    # Have to do this in two parts so we know which side of the relation object
+    # to nab.
+    %w(to from).each do |which|
+      issue.send("relations_#{which}".to_sym).each do |relation|
+        # Add note+link at bottom of desc
+        i = relation.send("issue_#{which=='from' ? 'to' : 'from'}".to_sym)
+        params[:body] << "* ##{i.id}: #{i.subject}\n"
+      end
+    end
     # For each journal/comment, sorting by created_on:
     #   Add to GH issue
     #   Include original username, submit date in body field
