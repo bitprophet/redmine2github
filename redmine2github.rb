@@ -34,7 +34,8 @@ repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
 skipped_ids = []
 
-issue_ids = %w(282 358 114 3 10)
+#issue_ids = %w(282 358 114 3 10 7)
+issue_ids = %w(7 49 223)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
@@ -117,27 +118,28 @@ issues.each do |issue|
     #   If closed, assign to real closed milestone
     #   If open, label as 1.x or 2.x - no milestone
     # If issue was closed, close it on GH
-    #puts "Would generate following POST params hash:"
-    #pp params
-    #puts ""
-    #puts "Human readable body text:"
-    #puts params[:body]
-    begin
-    # Ensure labels exist
-    params[:labels].each do |label|
-      begin
-        repo["/labels/#{label}"].get
-      rescue RestClient::ResourceNotFound
-        puts ">> Creating new label '#{label}'"
-        repo["/labels"].post({:name => label}.to_json)
-      end
-    end
-    # Post it!
+    puts "Would generate following POST params hash:"
+    pp params
+    puts ""
+    puts "Human readable body text:"
+    puts params[:body]
+    #begin
+    ## Ensure labels exist
+    #params[:labels].each do |label|
+    #  begin
+    #    repo["/labels/#{label}"].get
+    #  rescue RestClient::ResourceNotFound
+    #    puts ">> Creating new label '#{label}'"
+    #    repo["/labels"].post({:name => label}.to_json)
+    #  end
+    #end
+    ## Post it!
     #repo['/issues'].post(params.to_json, :content_type => 'text/json')
-    rescue => e
-      pp JSON.parse(e.response)
-      raise
-    end
+    #rescue => e
+    #  pp e
+    #  pp JSON.parse(e.response)
+    #  raise
+    #end
   #end
 end
 
