@@ -10,14 +10,15 @@ issues = issue_ids.map {|x| Issue.find(x)}
 
 
 def submitter_link(github, author)
-  unless author.login == "jforcier"
-    submitter = author.login
-    begin
-      gh_user = JSON.parse github["users/#{submitter}"].get
-      "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
-    rescue RestClient::ResourceNotFound
-      "**#{author.name}** (#{submitter})"
-    end
+  map = {
+    'jforcier' => 'bitprophet'
+  }
+  submitter = map.fetch author.login, author.login
+  begin
+    gh_user = JSON.parse github["users/#{submitter}"].get
+    "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
+  rescue RestClient::ResourceNotFound
+    "**#{author.name}** (#{submitter})"
   end
 end
 
