@@ -1,6 +1,6 @@
 require 'github'
 
-POST_OK = true
+POST_OK = false
 
 repo = GitHub.new "repos/#{REPO}"
 github = GitHub.new
@@ -31,7 +31,7 @@ end
 def submit_line(github, author, object)
   link = submitter_link(github, author)
   submitter_text = link ? " by #{link}" : ""
-  "\n\n----\n\nOriginally submitted#{submitter_text}#{submit_date(github, object)}"
+  "Originally submitted#{submitter_text}#{submit_date(github, object)}"
 end
 
 
@@ -53,7 +53,7 @@ issues.each do |issue|
       :labels => []
     }
     #   Create date in desc #   Submitter note in desc
-    params[:body] << submit_line(github, issue.author, issue)
+    params[:body] << "\n\n----\n\n" + submit_line(github, issue.author, issue)
     # Set labels for quick, wart, others?
     priority = issue.priority.name
     params[:labels] << priority if %w(Quick Wart).include?(priority)
@@ -111,7 +111,7 @@ issues.each do |issue|
       next unless journal.notes
       body = journal.notes
       # Include original username, submit date in body field
-      body << submit_line(github, journal.user, journal)
+      body = submit_line(github, journal.user, journal) + "\n\n----\n\n#{body}"
       # Add to GH issue
       comment_params << {:body => body}
     end
