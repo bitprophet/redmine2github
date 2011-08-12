@@ -3,7 +3,7 @@ require 'json'
 
 REPO = ENV['REPO'] || "bitprophet/issuetest"
 
-ENV['RESTCLIENT_LOG'] = 'stdout'
+#ENV['RESTCLIENT_LOG'] = 'stdout'
 require 'rest_client'
 
 
