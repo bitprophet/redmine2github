@@ -67,7 +67,7 @@ issues.each do |issue|
     gisted[a.filename] = JSON.parse(response)['html_url']
   end
   # Add note at bottom of desc w/ link
-  if gisted
+  unless gisted.empty?
     params[:body] << "\n\n### Attachments\n\n"
     params[:body] << gisted.map {|name, url| "* [#{name}](#{url})"}.join("\n")
   end
