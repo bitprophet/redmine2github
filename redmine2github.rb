@@ -99,11 +99,13 @@ issues.each do |issue|
     end
   end
 
-  puts "Would generate following POST params hash:"
-  pp params
-  puts ""
-  puts "Human readable body text:"
-  puts params[:body]
+  unless POST_OK
+    puts "Would generate following POST params hash:"
+    pp params
+    puts ""
+    puts "Human readable body text:"
+    puts params[:body]
+  end
 
   # For each journal/comment, sorting by created_on:
   comment_params = []
@@ -115,12 +117,14 @@ issues.each do |issue|
     # Add to GH issue
     comment_params << {:body => body}
   end
-  puts ""
-  puts "Would generate following comment params hashes:"
-  pp comment_params
 
-  puts ""
-  puts "Would close!" if is_closed
+  unless POST_OK
+    puts ""
+    puts "Would generate following comment params hashes:"
+    pp comment_params
+    puts ""
+    puts "Would close!" if is_closed
+  end
 
   begin
     # Ensure labels exist
