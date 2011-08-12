@@ -15,7 +15,7 @@ def submit_link(github, author)
   }
   submitter = map.fetch author.login, author.login
   begin
-    gh_user = JSON.parse github["users/#{submitter}"].get
+    gh_user = USERS.get submitter
     "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
   rescue RestClient::ResourceNotFound
     "**#{author.name}** (#{submitter})"

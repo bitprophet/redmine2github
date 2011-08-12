@@ -58,6 +58,19 @@ class MilestoneCache
 end
 
 
+class UserCache
+  def initialize(api)
+    @api = api
+    @users = {}
+  end
+
+  def get(username)
+    @users[username] ||= JSON.parse @api["users/#{username}"].get
+  end
+end
+
+
 REPO = GithubAPI.new "repos/#{REPO_PATH}"
 GITHUB = GithubAPI.new
 MILESTONES = MilestoneCache.new REPO
+USERS = UserCache.new GITHUB
