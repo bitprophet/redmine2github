@@ -39,13 +39,16 @@ issues.each do |issue|
     :assignee => "bitprophet", # Always assigned to me
     :labels => []
   }
+
   #   Create date in desc #   Submitter note in desc
   params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(github, issue.author) + submit_date(github, issue)}"
+
   # Set labels for quick, wart, others?
   priority = issue.priority.name
   params[:labels] << priority if %w(Quick Wart).include?(priority)
   # Bug, feature, support
   params[:labels] << issue.tracker.name
+
   # For each attachment:
   gisted = {}
   issue.attachments.each do |a|
@@ -71,6 +74,7 @@ issues.each do |issue|
     params[:body] << "\n\n### Attachments\n\n"
     params[:body] << gisted.map {|name, url| "* [#{name}](#{url})"}.join("\n")
   end
+
   # For each related issue:
   params[:body] << "\n\n### Relations\n\n" unless issue.relations.empty?
   # Have to do this in two parts so we know which side of the relation object
@@ -82,10 +86,14 @@ issues.each do |issue|
       params[:body] << "* ##{i.id}: #{i.subject}\n"
     end
   end
+
   # Assign to appropriate milestone:
   #   If closed, assign to real closed milestone
   #   If open, label as 1.x or 2.x - no milestone
+
   # If issue was closed, close it on GH
+
+
   puts "Would generate following POST params hash:"
   pp params
   puts ""
