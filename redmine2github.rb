@@ -146,7 +146,7 @@ issues.each do |issue|
     end
     # Close if closed!
     if is_closed
-      REPO["/issues/#{issue.id}"].patch(
+      REPO["/issues/#{issue.id}"].post(
         {:state => "closed"}.to_json,
         :content_type => "text/json"
       )
