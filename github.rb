@@ -36,19 +36,23 @@ class MilestoneCache
     @milestones = {}
   end
 
-  def list_milestones
+  def list
     JSON.parse(@api['/milestones'].get).each do |milestone|
       @milestones[milestone['title']] = milestone
     end if @milestones.empty?
     @milestones
   end
 
-  def get_milestone(name)
-    list_milestones.fetch(name) do
-      JSON.parse(@api['/milestones'].post(
-        {'title' => name}.to_json,
-        :content_type => 'text/json'
-      ))
+  def create(name, closed=false)
+    JSON.parse(@api['/milestones'].post(
+      {'title' => name}.to_json,
+      :content_type => 'text/json'
+    ))
+  end
+
+  def get(name, closed)
+    list.fetch(name) do
+      create(name, closed)
     end
   end
 end

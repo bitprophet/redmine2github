@@ -87,14 +87,20 @@ issues.each do |issue|
   end
 
   # Assign to appropriate milestone and handle closed status
+  is_closed = false
   if issue.status.is_closed
     # If closed, assign to real closed milestone
-    puts "closed"
+    milestone = MILESTONES.get(issue.fixed_version.name, true)
+    params[:milestone] = milestone['number']
     # If issue was closed, close it on GH
+    is_closed = true
   else
-    puts "open"
-    # If open, label as 1.x or 2.x - no milestone
-    #if issue.fixed_version.name =~ /^1\./
+    # If open, label as 0.9.x, 1.x or 2.x - no milestone
+    %w(0\.9 1 2).each do |which|
+      if issue.fixed_version.name =~ /^#{which}\./
+        params[:milestone] = MILESTONES.get("#{which}.x")['number']
+      end
+    end
   end
 
   puts "Would generate following POST params hash:"
@@ -117,6 +123,9 @@ issues.each do |issue|
   puts "Would generate following comment params hashes:"
   pp comment_params
 
+  puts ""
+  puts "Would close!" if is_closed
+
   begin
     # Ensure labels exist
     params[:labels].each do |label|
@@ -135,6 +144,14 @@ issues.each do |issue|
         comment.to_json, :content_type => 'text/json'
       )
     end
+    # Close if closed!
+    if is_closed
+      REPO["/issues/#{issue.id}"].patch(
+        {:state => "closed"}.to_json,
+        :content_type => "text/json"
+      )
+    end
+
   rescue => e
     pp e
     pp JSON.parse(e.response)
