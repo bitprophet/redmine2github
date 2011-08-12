@@ -22,8 +22,6 @@ def submit_date(github, object)
   object.created_on.strftime(" on **%F** at **%I:%M%P %Z**")
 end
 
-LABELS = {}
-
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
 issues.each do |issue|
@@ -130,11 +128,8 @@ issues.each do |issue|
   begin
     # Ensure labels exist
     params[:labels].each do |label|
-      unless LABELS.include? label
-        puts ">> Creating new label '#{label}'"
-        REPO["/labels"].post({:name => label}.to_json)
-        LABELS[label] = true
-      end
+      # Just using for its side effect right now
+      LABELS.get(label)
     end
     # Post it!
     response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')

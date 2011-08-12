@@ -81,7 +81,40 @@ class UserCache
 end
 
 
+class LabelCache
+  def initialize(api)
+    @api = api
+    @labels = {}
+  end
+
+  def list
+    JSON.parse(@api['/labels'].get).each do |label|
+      @labels[label['name']] = label
+    end if @labels.empty?
+    @labels
+  end
+
+  def create(name, closed=false)
+    if POST_OK
+      JSON.parse(@api['/labels'].post(
+        {'title' => name}.to_json,
+        :content_type => 'text/json'
+      ))
+    else
+      {:title => name, :number => 1}
+    end
+  end
+
+  def get(name, closed=false)
+    list.fetch(name) do
+      create(name, closed)
+    end
+  end
+end
+
+
 REPO = GithubAPI.new "repos/#{REPO_PATH}"
 GITHUB = GithubAPI.new
 MILESTONES = MilestoneCache.new REPO
 USERS = UserCache.new GITHUB
+LABELS = LabelCache.new REPO
