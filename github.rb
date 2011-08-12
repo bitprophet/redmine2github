@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'json'
 
+POST_OK = false
 REPO_PATH = ENV['REPO'] || "bitprophet/issuetest"
 
 ENV['RESTCLIENT_LOG'] = 'stdout'
@@ -44,10 +45,14 @@ class MilestoneCache
   end
 
   def create(name, closed=false)
-    JSON.parse(@api['/milestones'].post(
-      {'title' => name}.to_json,
-      :content_type => 'text/json'
-    ))
+    if POST_OK
+      JSON.parse(@api['/milestones'].post(
+        {'title' => name}.to_json,
+        :content_type => 'text/json'
+      ))
+    else
+      {:title => name, :number => 1}
+    end
   end
 
   def get(name, closed=false)
