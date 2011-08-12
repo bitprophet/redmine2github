@@ -11,7 +11,7 @@ issue_ids = %w(49)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 
-def submitter_link(github, author)
+def submit_link(github, author)
   map = {
     'jforcier' => 'bitprophet'
   }
@@ -25,13 +25,7 @@ def submitter_link(github, author)
 end
 
 def submit_date(github, object)
-  " on #{object.created_on.strftime("**%F** at **%I:%M%P %Z**")}"
-end
-
-def submit_line(github, author, object)
-  link = submitter_link(github, author)
-  submitter_text = link ? " by #{link}" : ""
-  "Originally submitted#{submitter_text}#{submit_date(github, object)}"
+  object.created_on.strftime(" on **%F** at **%I:%M%P %Z**")
 end
 
 
@@ -53,7 +47,7 @@ issues.each do |issue|
       :labels => []
     }
     #   Create date in desc #   Submitter note in desc
-    params[:body] << "\n\n----\n\n" + submit_line(github, issue.author, issue)
+    params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(github, issue.author) + submit_date(github, issue)}"
     # Set labels for quick, wart, others?
     priority = issue.priority.name
     params[:labels] << priority if %w(Quick Wart).include?(priority)
@@ -111,7 +105,7 @@ issues.each do |issue|
       next unless journal.notes
       body = journal.notes
       # Include original username, submit date in body field
-      body = submit_line(github, journal.user, journal) + "\n\n----\n\n#{body}"
+      body =  "#{submit_link(github, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{submit_date(github, journal)}"
       # Add to GH issue
       comment_params << {:body => body}
     end
