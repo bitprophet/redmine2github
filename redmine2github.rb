@@ -94,7 +94,7 @@ issues.each do |issue|
     # If open, label as 0.9.x, 1.x or 2.x - no milestone
     %w(0\.9 1 2).each do |which|
       if issue.fixed_version.name =~ /^#{which}\./
-        params[:milestone] = MILESTONES.get("#{which}.x")['number']
+        params[:labels] << "#{which}.x"
       end
     end
   end
