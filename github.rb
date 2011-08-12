@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'json'
 
-REPO = ENV['REPO'] || "bitprophet/issuetest"
+REPO_PATH = ENV['REPO'] || "bitprophet/issuetest"
 
 ENV['RESTCLIENT_LOG'] = 'stdout'
 require 'rest_client'
@@ -33,30 +33,27 @@ end
 class MilestoneCache
   def initialize(api)
     @api = api
+    @milestones = {}
   end
 
   def list_milestones
-    JSON.parse @api['/milestones'].get
+    JSON.parse(@api['/milestones'].get).each do |milestone|
+      @milestones[milestone['title']] = milestone
+    end if @milestones.empty?
+    @milestones
   end
 
   def get_milestone(name)
-    matches = list_milestones.select {|x| x['title'] == name}
-    pp matches
-    if matches.size > 1
-      puts "!!! Tried to get milestone '#{name}' and got back >1 match!"
-      exit 1
-    elsif matches.size == 1
-      matches[0]
-    else
-      JSON.parse @api['/milestones'].post(
+    list_milestones.fetch(name) do
+      JSON.parse(@api['/milestones'].post(
         {'title' => name}.to_json,
         :content_type => 'text/json'
-      )
+      ))
     end
   end
 end
 
 
-REPO = GithubAPI.new "repos/#{REPO}"
+REPO = GithubAPI.new "repos/#{REPO_PATH}"
 GITHUB = GithubAPI.new
 MILESTONES = MilestoneCache.new REPO
