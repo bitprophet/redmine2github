@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'json'
 
-POST_OK = false
+POST_OK = true
 REPO_PATH = ENV['REPO'] || "bitprophet/issuetest"
 
 ENV['RESTCLIENT_LOG'] = 'stdout'
@@ -94,20 +94,21 @@ class LabelCache
     @labels
   end
 
-  def create(name, closed=false)
+  def create(name)
     if POST_OK
       JSON.parse(@api['/labels'].post(
-        {'title' => name}.to_json,
+        {'name' => name}.to_json,
         :content_type => 'text/json'
       ))
     else
-      {:title => name, :number => 1}
+      {:name => name, :number => 1}
     end
   end
 
-  def get(name, closed=false)
+  def get(name)
+    puts "############### trying to fetch #{name.inspect} from #{list.inspect}"
     list.fetch(name) do
-      create(name, closed)
+      create(name)
     end
   end
 end
