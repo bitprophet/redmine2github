@@ -1,7 +1,5 @@
 require 'github'
 
-skipped_ids = []
-
 issue_ids = %w(282 358 114 3 10 7)
 #issue_ids = %w(10)
 issues = issue_ids.map {|x| Issue.find(x)}
