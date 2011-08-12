@@ -2,8 +2,6 @@ require 'github'
 
 POST_OK = false
 
-repo = GitHub.new "repos/#{REPO}"
-github = GitHub.new
 skipped_ids = []
 
 #issue_ids = %w(282 358 114 3 10 7)
@@ -28,30 +26,6 @@ def submit_date(github, object)
   object.created_on.strftime(" on **%F** at **%I:%M%P %Z**")
 end
 
-class MilestoneCache
-  def initialize(api)
-    @api = api
-  end
-
-  def list_milestones
-    @api['/milestones'].get
-  end
-
-  def get_milestone(name)
-    matches = list_milestones.select {|x| x['title'] == name}
-    JSON.parse(if matches.size > 1
-      puts "!!! Tried to get milestone '#{name}' and got back >1 match!"
-      exit 1
-    elsif matches.size == 1
-      matches[0]
-    else
-      @api['/milestones'].post(
-        {'title' => name}.to_json,
-        :content_type => 'text/json'
-      )
-    end)
-  end
-end
 
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
@@ -66,7 +40,7 @@ issues.each do |issue|
   }
 
   #   Create date in desc #   Submitter note in desc
-  params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(github, issue.author) + submit_date(github, issue)}"
+  params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(GITHUB, issue.author) + submit_date(GITHUB, issue)}"
 
   # Set labels for quick, wart, others?
   priority = issue.priority.name
@@ -85,7 +59,7 @@ issues.each do |issue|
       next
     end
     # Create gist
-    response = github["gists"].post({
+    response = GITHUB["gists"].post({
       :public => false,
       :description => a.description,
       :files => {
@@ -112,12 +86,16 @@ issues.each do |issue|
     end
   end
 
-  # Assign to appropriate milestone:
-  #   If closed, assign to real closed milestone
-  #   If open, label as 1.x or 2.x - no milestone
-
-  # If issue was closed, close it on GH
-
+  # Assign to appropriate milestone and handle closed status
+  if issue.status.is_closed
+    # If closed, assign to real closed milestone
+    puts "closed"
+    # If issue was closed, close it on GH
+  else
+    puts "open"
+    # If open, label as 1.x or 2.x - no milestone
+    #if issue.fixed_version.name =~ /^1\./
+  end
 
   puts "Would generate following POST params hash:"
   pp params
@@ -131,7 +109,7 @@ issues.each do |issue|
     next unless journal.notes
     body = journal.notes
     # Include original username, submit date in body field
-    body =  "#{submit_link(github, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{submit_date(github, journal)}"
+    body =  "#{submit_link(GITHUB, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{submit_date(GITHUB, journal)}"
     # Add to GH issue
     comment_params << {:body => body}
   end
@@ -143,17 +121,17 @@ issues.each do |issue|
     # Ensure labels exist
     params[:labels].each do |label|
       begin
-        repo["/labels/#{label}"].get
+        REPO["/labels/#{label}"].get
       rescue RestClient::ResourceNotFound
         puts ">> Creating new label '#{label}'"
-        repo["/labels"].post({:name => label}.to_json)
+        REPO["/labels"].post({:name => label}.to_json)
       end
     end
     # Post it!
-    response = repo['/issues'].post(params.to_json, :content_type => 'text/json')
+    response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')
     # Post comments!
     comment_params.each do |comment|
-      repo["/issues/#{JSON.parse(response)['number']}/comments"].post(
+      REPO["/issues/#{JSON.parse(response)['number']}/comments"].post(
         comment.to_json, :content_type => 'text/json'
       )
     end
