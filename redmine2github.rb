@@ -14,11 +14,11 @@ def submit_link(github, author)
     'jforcier' => 'bitprophet'
   }
   submitter = map.fetch author.login, author.login
-  begin
-    gh_user = USERS.get submitter
-    "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
-  rescue RestClient::ResourceNotFound
+  gh_user = USERS.get submitter
+  if gh_user.class == NoSuchUser
     "**#{author.name}** (#{submitter})"
+  else
+    "**#{gh_user['name']}** ([#{submitter}](#{gh_user['html_url']}))"
   end
 end
 

@@ -57,6 +57,8 @@ class MilestoneCache
   end
 end
 
+class NoSuchUser
+end
 
 class UserCache
   def initialize(api)
@@ -65,7 +67,11 @@ class UserCache
   end
 
   def get(username)
-    @users[username] ||= JSON.parse @api["users/#{username}"].get
+    @users[username] ||= begin
+      JSON.parse @api["users/#{username}"].get
+    rescue RestClient::ResourceNotFound
+      NoSuchUser.new
+    end
   end
 end
 
