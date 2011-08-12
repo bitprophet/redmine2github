@@ -50,7 +50,7 @@ class MilestoneCache
     ))
   end
 
-  def get(name, closed)
+  def get(name, closed=false)
     list.fetch(name) do
       create(name, closed)
     end
