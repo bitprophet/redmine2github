@@ -155,5 +155,3 @@ issues.each do |issue|
   end if POST_OK
 
 end
-
-puts "Skipped #{skipped_ids.size} issue(s) numbered #{skipped_ids.join(", ")}."
