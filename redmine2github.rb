@@ -7,7 +7,7 @@ github = GitHub.new
 skipped_ids = []
 
 #issue_ids = %w(282 358 114 3 10 7)
-issue_ids = %w(49)
+issue_ids = %w(10)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 
@@ -26,6 +26,31 @@ end
 
 def submit_date(github, object)
   object.created_on.strftime(" on **%F** at **%I:%M%P %Z**")
+end
+
+class MilestoneCache
+  def initialize(api)
+    @api = api
+  end
+
+  def list_milestones
+    @api['/milestones'].get
+  end
+
+  def get_milestone(name)
+    matches = list_milestones.select {|x| x['title'] == name}
+    JSON.parse(if matches.size > 1
+      puts "!!! Tried to get milestone '#{name}' and got back >1 match!"
+      exit 1
+    elsif matches.size == 1
+      matches[0]
+    else
+      @api['/milestones'].post(
+        {'title' => name}.to_json,
+        :content_type => 'text/json'
+      )
+    end)
+  end
 end
 
 
