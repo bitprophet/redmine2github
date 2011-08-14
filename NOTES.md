@@ -24,6 +24,7 @@
 * `category` => map to a label with similar name
     * Take this opportunity to remap bad or redundant categories, like UI vs CLI
 * `status` => map to open/closed, *and* probably to a label too in some cases
+    * Not bothering with anything but open/closed; I don't need to search for issues marked Duplicate, for example, so they shouldn't be labels. Closed is closed is closed; assigned is handled by a new field on GH's side; everything else is irrelevant.
 * `assigned_to` => "bitprophet"
 * `priority` => map some to labels, eg wart and quick, drop the rest
 * `author` => note in body text
