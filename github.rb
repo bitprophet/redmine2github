@@ -31,33 +31,35 @@ class GithubAPI
 end
 
 
-class MilestoneCache
-  def initialize(api)
+class ItemCache
+  def initialize(api, urlpart, key)
     @api = api
-    @milestones = {}
+    @urlpart = urlpart
+    @key = key
+    @items = {}
   end
 
   def list
-    JSON.parse(@api['/milestones'].get).each do |milestone|
-      @milestones[milestone['title']] = milestone
-    end if @milestones.empty?
-    @milestones
+    JSON.parse(@api[@urlpart].get).each do |item|
+      @items[item[@key]] = item
+    end if @items.empty?
+    @items
   end
 
-  def create(name, closed=false)
-    if POST_OK
-      JSON.parse(@api['/milestones'].post(
-        {'title' => name}.to_json,
+  def create(value)
+    @items[value] = if POST_OK
+      JSON.parse(@api[@urlpart].post(
+        {@key => value}.to_json,
         :content_type => 'text/json'
       ))
     else
-      {:title => name, :number => 1}
+      {@key => value, :number => 1}
     end
   end
 
-  def get(name, closed=false)
-    list.fetch(name) do
-      create(name, closed)
+  def get(value)
+    list.fetch(value) do
+      create(value)
     end
   end
 end
@@ -81,41 +83,8 @@ class UserCache
 end
 
 
-class LabelCache
-  def initialize(api)
-    @api = api
-    @labels = {}
-  end
-
-  def list
-    JSON.parse(@api['/labels'].get).each do |label|
-      @labels[label['name']] = label
-    end if @labels.empty?
-    @labels
-  end
-
-  def create(name)
-    if POST_OK
-      JSON.parse(@api['/labels'].post(
-        {'name' => name}.to_json,
-        :content_type => 'text/json'
-      ))
-    else
-      {:name => name, :number => 1}
-    end
-  end
-
-  def get(name)
-    puts "############### trying to fetch #{name.inspect} from #{list.inspect}"
-    list.fetch(name) do
-      create(name)
-    end
-  end
-end
-
-
 REPO = GithubAPI.new "repos/#{REPO_PATH}"
 GITHUB = GithubAPI.new
-MILESTONES = MilestoneCache.new REPO
+MILESTONES = ItemCache.new REPO, '/milestones', 'title'
 USERS = UserCache.new GITHUB
-LABELS = LabelCache.new REPO
+LABELS = ItemCache.new REPO, '/labels', 'name'
