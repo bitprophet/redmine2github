@@ -134,15 +134,16 @@ issues.each do |issue|
     end
     # Post it!
     response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')
+    gh_issue = JSON.parse(response)
     # Post comments!
     comment_params.each do |comment|
-      REPO["/issues/#{JSON.parse(response)['number']}/comments"].post(
+      REPO["/issues/#{gh_issue['number']}/comments"].post(
         comment.to_json, :content_type => 'text/json'
       )
     end
     # Close if closed!
     if is_closed
-      REPO["/issues/#{issue.id}"].post(
+      REPO["/issues/#{gh_issue['number']}"].post(
         {:state => "closed"}.to_json,
         :content_type => "text/json"
       )
