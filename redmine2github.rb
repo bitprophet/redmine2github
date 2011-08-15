@@ -18,8 +18,8 @@ def submit_link(github, author)
   end
 end
 
-def submit_date(github, object)
-  object.created_on.strftime(" on **%F** at **%I:%M%P %Z**")
+def date(object, attr=:created_on)
+  object.send(attr).strftime(" on **%F** at **%I:%M%P %Z**")
 end
 
 
@@ -35,7 +35,7 @@ issues.each do |issue|
   }
 
   #   Create date in desc #   Submitter note in desc
-  params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(GITHUB, issue.author) + submit_date(GITHUB, issue)}"
+  params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(GITHUB, issue.author) + date(issue)}"
 
   # Set labels for quick, wart, others?
   priority = issue.priority.name
@@ -83,13 +83,16 @@ issues.each do |issue|
 
   # Assign to appropriate milestone and handle closed status
   is_closed = false
-  if issue.status.is_closed
+  status = issue.status
+  if status.is_closed
     # If closed, assign to real closed milestone
     # TODO: close milestone
     milestone = MILESTONES.get(issue.fixed_version.name)
     params[:milestone] = milestone['number']
     # If issue was closed, close it on GH
     is_closed = true
+    # And add the "why" to the body
+    params[:body] << "\n\n----\n\nClosed as #{status.name}#{date(issue, :updated_on)}"
   else
     # If open, label as 0.9.x, 1.x or 2.x - no milestone
     %w(0\.9 1 2).each do |which|
@@ -113,7 +116,7 @@ issues.each do |issue|
     next unless journal.notes
     body = journal.notes
     # Include original username, submit date in body field
-    body =  "#{submit_link(GITHUB, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{submit_date(GITHUB, journal)}"
+    body =  "#{submit_link(GITHUB, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{date(journal)}"
     # Add to GH issue
     comment_params << {:body => body}
   end
