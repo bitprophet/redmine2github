@@ -1,7 +1,7 @@
 require 'github'
 
 issue_ids = %w(282 358 114 3 10 7 405)
-issue_ids = %w(405)
+#issue_ids = %w(405)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 

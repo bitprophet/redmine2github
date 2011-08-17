@@ -3,7 +3,7 @@ require 'json'
 
 POST_OK = true
 #POST_OK = false
-REPO_PATH = ENV['REPO'] || "bitprophet/issuetest"
+REPO_PATH = ENV['REPO'] || "fabric/issuetest"
 
 ENV['RESTCLIENT_LOG'] = 'stdout'
 require 'rest_client'
