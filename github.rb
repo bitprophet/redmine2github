@@ -2,6 +2,7 @@ require 'rubygems'
 require 'json'
 
 POST_OK = true
+#POST_OK = false
 REPO_PATH = ENV['REPO'] || "bitprophet/issuetest"
 
 ENV['RESTCLIENT_LOG'] = 'stdout'
