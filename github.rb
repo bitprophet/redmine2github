@@ -39,10 +39,16 @@ class ItemCache
     @items = {}
   end
 
+  def fetch(params={})
+    items = {}
+    JSON.parse(@api[@urlpart].get(:params => params)).each do |item|
+      items[item[@key]] = item
+    end
+    items
+  end
+
   def list
-    JSON.parse(@api[@urlpart].get).each do |item|
-      @items[item[@key]] = item
-    end if @items.empty?
+    @items = fetch if @items.empty?
     @items
   end
 
@@ -64,6 +70,18 @@ class ItemCache
   end
 end
 
+
+class MilestoneCache < ItemCache
+  def list
+    if @items.empty?
+      @items.merge! fetch(:state => "open")
+      @items.merge! fetch(:state => "closed")
+    end
+    @items
+  end
+end
+
+
 class NoSuchUser
 end
 
@@ -74,10 +92,16 @@ class UserCache
   end
 
   def get(username)
+    begin
     @users[username] ||= begin
       JSON.parse @api["users/#{username}"].get
     rescue RestClient::ResourceNotFound
       NoSuchUser.new
+    end
+    rescue => e
+      pp e
+      pp JSON.parse(e.response)
+      raise
     end
   end
 end
@@ -85,6 +109,6 @@ end
 
 REPO = GithubAPI.new "repos/#{REPO_PATH}"
 GITHUB = GithubAPI.new
-MILESTONES = ItemCache.new REPO, '/milestones', 'title'
+MILESTONES = MilestoneCache.new REPO, '/milestones', 'title'
 USERS = UserCache.new GITHUB
 LABELS = ItemCache.new REPO, '/labels', 'name'
