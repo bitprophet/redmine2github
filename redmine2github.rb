@@ -87,8 +87,10 @@ issues.each do |issue|
   if status.is_closed
     # If closed, assign to real closed milestone
     # TODO: close milestone
-    milestone = MILESTONES.get(issue.fixed_version.name)
-    params[:milestone] = milestone['number']
+    if issue.fixed_version
+      milestone = MILESTONES.get(issue.fixed_version.name)
+      params[:milestone] = milestone['number']
+    end
     # If issue was closed, close it on GH
     is_closed = true
     # And add the "why" to the body
