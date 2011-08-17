@@ -94,7 +94,7 @@ issues.each do |issue|
     # If issue was closed, close it on GH
     is_closed = true
     # And add the "why" to the body
-    params[:body] << "\n\n----\n\nClosed as #{status.name}#{date(issue, :updated_on)}"
+    params[:body] << "\n\n----\n\nClosed as *#{status.name}*#{date(issue, :updated_on)}"
   else
     # If open, label as 0.9.x, 1.x or 2.x - no milestone
     %w(0\.9 1 2).each do |which|
