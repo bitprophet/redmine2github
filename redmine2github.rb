@@ -108,7 +108,7 @@ issues.each do |issue|
     params[:body] << "\n\n----\n\nClosed as *#{status.name}*#{date(issue, :updated_on)}"
   else
     # If open, label as 0.9.x, 1.x or 2.x - no milestone
-    %w(0\.9 1 2).each do |which|
+    %w(0.9 1 2).each do |which|
       if issue.fixed_version.name =~ /^#{which}\./
         params[:labels] << "#{which}.x"
       end
