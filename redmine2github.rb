@@ -1,8 +1,9 @@
 require 'github'
 
-issue_ids = %w(282 358 114 3 10 7 405 399)
-#issue_ids = %w(399)
-issues = issue_ids.map {|x| Issue.find(x)}
+#issue_ids = %w(282 358 114 3 10 7 405 399)
+#issue_ids = %w(260)
+#issues = issue_ids.map {|x| Issue.find(x)}
+issues = Issue.find(:all, :order => "id ASC")
 
 
 def submit_link(github, author)
