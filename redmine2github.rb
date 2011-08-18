@@ -112,7 +112,7 @@ issues.each do |issue|
       if issue.fixed_version.name =~ /^#{which}\./
         params[:labels] << "#{which}.x"
       end
-    end
+    end if issue.fixed_version
   end
 
   # For each journal/comment, sorting by created_on:
