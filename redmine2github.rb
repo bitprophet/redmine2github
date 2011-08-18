@@ -1,7 +1,7 @@
 require 'github'
 
-issue_ids = %w(282 358 114 3 10 7 405)
-#issue_ids = %w(405)
+issue_ids = %w(282 358 114 3 10 7 405 399)
+#issue_ids = %w(399)
 issues = issue_ids.map {|x| Issue.find(x)}
 
 
@@ -132,23 +132,30 @@ issues.each do |issue|
     # Post it!
     response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')
     gh_issue = JSON.parse(response)
-    # Post comments!
-    comment_params.each do |comment|
-      REPO["/issues/#{gh_issue['number']}/comments"].post(
-        comment.to_json, :content_type => 'text/json'
-      )
-    end
-    # Close if closed!
-    if is_closed
-      REPO["/issues/#{gh_issue['number']}"].post(
-        {:state => "closed"}.to_json,
-        :content_type => "text/json"
-      )
-    end
+    # Store comments!
+    comments[gh_issue['number']] = comment_params
+    # Store closed status!
+    closed << gh_issue['number'] if is_closed
   rescue => e
     pp e
     pp JSON.parse(e.response)
     raise
   end if POST_OK
+end
 
+# Post comments!
+comments.each do |number, comment_params|
+  comment_params.each do |comment|
+    REPO["/issues/#{number}/comments"].post(
+      comment.to_json, :content_type => 'text/json'
+    )
+  end
+end
+
+# Close!
+closed.each do |number|
+  REPO["/issues/#{number}"].post(
+    {:state => "closed"}.to_json,
+    :content_type => "text/json"
+  )
 end
