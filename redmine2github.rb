@@ -110,14 +110,6 @@ issues.each do |issue|
     end
   end
 
-  unless POST_OK
-    puts "Would generate following POST params hash:"
-    pp params
-    puts ""
-    puts "Human readable body text:"
-    puts params[:body]
-  end
-
   # For each journal/comment, sorting by created_on:
   comment_params = []
   issue.journals.sort_by {|x| x.created_on}.each do |journal|
@@ -127,14 +119,6 @@ issues.each do |issue|
     body =  "#{submit_link(GITHUB, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{date(journal)}"
     # Add to GH issue
     comment_params << {:body => body}
-  end
-
-  unless POST_OK
-    puts ""
-    puts "Would generate following comment params hashes:"
-    pp comment_params
-    puts ""
-    puts "Would close!" if is_closed
   end
 
   begin
@@ -159,7 +143,6 @@ issues.each do |issue|
         :content_type => "text/json"
       )
     end
-
   rescue => e
     pp e
     pp JSON.parse(e.response)
