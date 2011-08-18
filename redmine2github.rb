@@ -77,7 +77,8 @@ issues.each do |issue|
     issue.send("relations_#{which}".to_sym).each do |relation|
       # Add note+link at bottom of desc
       i = relation.send("issue_#{which=='from' ? 'to' : 'from'}".to_sym)
-      params[:body] << "* ##{i.id}: #{i.subject}\n"
+      rel = GLoc::l(relation.label_for(i)).capitalize
+      params[:body] << "* #{rel} ##{i.id}: #{i.subject}\n"
     end
   end
 
