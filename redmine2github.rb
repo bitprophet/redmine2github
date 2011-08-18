@@ -43,10 +43,12 @@ issues.each do |issue|
   # Tracker name (bug, feature, support)
   params[:labels] << issue.tracker.name
   # Category (with some transformations)
-  category = issue.category.name
-  params[:labels] << {
-    "CLI" => "UI"
-  }.fetch(category, category)
+  if issue.category
+    category = issue.category.name
+    params[:labels] << {
+      "CLI" => "UI"
+    }.fetch(category, category)
+  end
 
   # For each attachment:
   gisted = {}
