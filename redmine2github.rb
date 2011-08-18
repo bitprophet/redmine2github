@@ -115,7 +115,7 @@ issues.each do |issue|
   # For each journal/comment, sorting by created_on:
   comment_params = []
   issue.journals.sort_by {|x| x.created_on}.each do |journal|
-    next unless journal.notes
+    next if journal.notes.nil? || journal.notes.empty?
     body = journal.notes
     # Include original username, submit date in body field
     body =  "#{submit_link(GITHUB, journal.user)} posted:\n\n----\n\n#{body}\n\n----\n\n#{date(journal)}"
