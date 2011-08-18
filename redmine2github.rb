@@ -22,6 +22,9 @@ def date(object, attr=:created_on)
   object.send(attr).strftime(" on **%F** at **%I:%M%P %Z**")
 end
 
+# Store comments, closed status as we go, post 'em at the end
+comments = {}
+closed = []
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
 issues.each do |issue|
