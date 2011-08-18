@@ -37,11 +37,16 @@ issues.each do |issue|
   #   Create date in desc #   Submitter note in desc
   params[:body] << "\n\n----\n\nOriginally submitted by #{submit_link(GITHUB, issue.author) + date(issue)}"
 
-  # Set labels for quick, wart, others?
+  # Some random-access-friendly priorities
   priority = issue.priority.name
   params[:labels] << priority if %w(Quick Wart).include?(priority)
-  # Bug, feature, support
+  # Tracker name (bug, feature, support)
   params[:labels] << issue.tracker.name
+  # Category (with some transformations)
+  category = issue.category.name
+  params[:labels] << {
+    "CLI" => "UI"
+  }.fetch(category, category)
 
   # For each attachment:
   gisted = {}
