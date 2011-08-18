@@ -165,18 +165,24 @@ closed = []
 end
 
 # Post comments!
+print "\nCommenting"
 comments.each do |number, comment_params|
   comment_params.each do |comment|
     REPO["/issues/#{number}/comments"].post(
       comment.to_json, :content_type => 'text/json'
     )
   end
+  print "."
 end
+print "\n"
 
 # Close!
+print "\nClosing"
 closed.each do |number|
   REPO["/issues/#{number}"].post(
     {:state => "closed"}.to_json,
     :content_type => "text/json"
   )
+  print "."
 end
+print "\n"
