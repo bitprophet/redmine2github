@@ -1,9 +1,8 @@
 require 'github'
 
 #issue_ids = %w(282 358 114 3 10 7 405 399)
-#issue_ids = %w(260)
 #issues = issue_ids.map {|x| Issue.find(x)}
-issues = Issue.find(:all, :order => "id ASC")
+#issues = Issue.find(:all, :order => "id ASC")
 
 
 def submit_link(github, author)
@@ -28,7 +27,19 @@ comments = {}
 closed = []
 
 #Issue.find(:all, :order => "id ASC").each do |issue|
-issues.each do |issue|
+1.upto(Issue.last.id) do |redmine_id|
+  begin
+    issue = Issue.find redmine_id
+  rescue ActiveRecord::RecordNotFound
+    puts "!!! No issue with ID #{redmine_id} found; creating dummy."
+    params = {
+      :title => "Dummy issue, ignore",
+      :body => "This issue intentionally left blank."
+    }
+    response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')
+    closed << redmine_id
+    next
+  end
   puts ">>> [#{issue.id}] #{issue.subject}"
   # Create new issue based on mapping
   params = {
@@ -136,10 +147,16 @@ issues.each do |issue|
     # Post it!
     response = REPO['/issues'].post(params.to_json, :content_type => 'text/json')
     gh_issue = JSON.parse(response)
+    gh_id = gh_issue['number']
+    # Sanity check
+    if gh_id != redmine_id
+      puts "!!! Posted Redmine issue ##{redmine_id} but got back Github issue ##{gh_id}"
+      exit 1
+    end
     # Store comments!
-    comments[gh_issue['number']] = comment_params
+    comments[gh_id] = comment_params
     # Store closed status!
-    closed << gh_issue['number'] if is_closed
+    closed << gh_id if is_closed
   rescue => e
     pp e
     pp JSON.parse(e.response)

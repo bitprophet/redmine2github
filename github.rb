@@ -4,7 +4,7 @@ require 'json'
 POST_OK = true
 REPO_PATH = ENV['REPO'] || "fabric/issuetest"
 
-ENV['RESTCLIENT_LOG'] = 'stdout'
+#ENV['RESTCLIENT_LOG'] = 'stdout'
 require 'rest_client'
 
 
