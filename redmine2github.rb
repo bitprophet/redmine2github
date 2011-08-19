@@ -93,9 +93,10 @@ closed = []
   %w(to from).each do |which|
     issue.send("relations_#{which}".to_sym).each do |relation|
       # Add note+link at bottom of desc
-      i = relation.send("issue_#{which=='from' ? 'to' : 'from'}".to_sym)
-      rel = GLoc::l(relation.label_for(i)).capitalize
-      params[:body] << "* #{rel} ##{i.id}: #{i.subject}\n"
+      to = which == 'to'
+      target = relation.send("issue_#{to ? 'from' : 'to'}".to_sym)
+      rel = GLoc::l(relation.label_for(issue)).capitalize
+      params[:body] << "* #{rel} ##{target.id}: #{target.subject}\n"
     end
   end
 
