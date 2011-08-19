@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 
 POST_OK = true
-REPO_PATH = ENV['REPO'] || "fabric/issuetest"
+REPO_PATH = ENV['REPO'] || "fabric/issuetest2"
 
 #ENV['RESTCLIENT_LOG'] = 'stdout'
 require 'rest_client'

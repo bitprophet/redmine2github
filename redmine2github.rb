@@ -1,9 +1,5 @@
 require 'github'
 
-#issue_ids = %w(282 358 114 3 10 7 405 399)
-#issues = issue_ids.map {|x| Issue.find(x)}
-#issues = Issue.find(:all, :order => "id ASC")
-
 
 def submit_link(github, author)
   map = {
@@ -26,7 +22,6 @@ end
 comments = {}
 closed = []
 
-#Issue.find(:all, :order => "id ASC").each do |issue|
 1.upto(Issue.last.id) do |redmine_id|
   begin
     issue = Issue.find redmine_id
